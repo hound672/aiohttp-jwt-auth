@@ -14,7 +14,7 @@ from .init import init_auth
 
 __all__ = ('init_auth', 'version_info')
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 VersionInfo = namedtuple('VersionInfo',
                          'major minor micro')

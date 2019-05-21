@@ -31,18 +31,17 @@ class JWTAuthMixin:
     _verify_expired = True
 
     def __init__(self, request: Request) -> None:
-
         try:
             user_data_token = self.authenticate(request)
             request['user'] = user_data_token
         except jwt_auth_exceptions.AuthFailed as err:
             raise web_exceptions.HTTPUnauthorized(
-                text=json.dumps({'error': str(err)}),
+                reason=str(err),
                 content_type='application/json'
             )
         except jwt_auth_exceptions.InternalServerError as err:
             raise web_exceptions.HTTPInternalServerError(
-                text=json.dumps({'error': str(err)}),
+                reason=str(err),
                 content_type='application/json'
             )
 
