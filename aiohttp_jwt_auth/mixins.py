@@ -9,13 +9,14 @@
 import json
 import logging
 
-from aiohttp.web_request import Request
 from aiohttp import web_exceptions
+from aiohttp.web_request import Request
+from pydantic import ValidationError
 
-from aiohttp_jwt_auth import exceptions as jwt_auth_exceptions
-from aiohttp_jwt_auth.structs import UserDataToken
-from aiohttp_jwt_auth.consts import JWT_AUTH_APP, JWT_PUBLIC_KEY, JWT_HEADER_PREFIX
-from aiohttp_jwt_auth.utils import get_authorization_header, validate_header, validate_token
+from . import exceptions as jwt_auth_exceptions
+from .structs import JwtAuthApp, BaseUserDataToken
+from .consts import APP_JWT_AUTH
+from .utils import get_authorization_header, get_jwt_string, decode_token
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +33,9 @@ class JWTAuthMixin:
 
     def __init__(self, request: Request) -> None:
         try:
-            user_data_token = self.authenticate(request)
-            request['user'] = user_data_token
+            user_data = self._authenticate(request)
+            request['user'] = user_data
+
         except jwt_auth_exceptions.AuthFailed as err:
             raise web_exceptions.HTTPUnauthorized(
                 reason=str(err),
@@ -47,21 +49,23 @@ class JWTAuthMixin:
 
         super().__init__(request)  # type: ignore
 
-    def authenticate(self, request: Request) -> UserDataToken:
+    def _authenticate(self, request: Request) -> 'BaseUserDataToken':
         """
-        Authenticate user and returns its dict
+        Authenticate user and returns its data
         """
+        assert APP_JWT_AUTH in request.config_dict, 'There is no APP_JWT_AUTH in aiohttp app'
+        app_auth: JwtAuthApp = request.config_dict[APP_JWT_AUTH]
+
+        auth_header = get_authorization_header(request)
+        jwt_string = get_jwt_string(header=auth_header,
+                                    jwt_header_prefix=app_auth.jwt_header_prefix)
+        decoded_jwt = decode_token(jwt_string=jwt_string,
+                                   public_key=app_auth.public_key,
+                                   verify_exp=self._verify_expired)
+
+        UserModel = app_auth.user_model
         try:
-            auth_app = request.config_dict[JWT_AUTH_APP]
-            public_key = auth_app[JWT_PUBLIC_KEY]
-            jwt_header_prefix = auth_app[JWT_HEADER_PREFIX]
-        except KeyError:
-            raise jwt_auth_exceptions.PublicKeyEmptyError
-
-        header = get_authorization_header(request)
-        token = validate_header(header=header,
-                                jwt_header_prefix=jwt_header_prefix)
-
-        user_data_token = validate_token(token=token, public_key=public_key,
-                                         verify_exp=self._verify_expired)
-        return user_data_token
+            user_data = UserModel(**decoded_jwt)
+        except ValidationError:
+            raise jwt_auth_exceptions.InvalidClaims
+        return user_data

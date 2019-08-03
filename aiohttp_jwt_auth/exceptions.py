@@ -31,6 +31,10 @@ class AuthFailed(JwtAuthBaseException):
     _detail = 'Incorrect authentication credentials.'
 
 
+class InvalidClaims(AuthFailed):
+    _detail = 'Invalid claims'
+
+
 class AuthFailedNoHeader(AuthFailed):
     _detail = 'There is no authorization header.'
 
@@ -51,6 +55,5 @@ class AuthFailedDecodeError(AuthFailed):
     def __init__(self, detail: str = None):
         self._detail = f'Error decode token: {detail}'
 
-
-class PublicKeyEmptyError(InternalServerError):
-    _detail = 'Public key is empty!'
+# class PublicKeyEmptyError(InternalServerError):
+#     _detail = 'Public key is empty!'

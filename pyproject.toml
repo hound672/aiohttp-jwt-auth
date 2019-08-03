@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiohttp-jwt-auth"
-version = "0.0.2"
+version = "0.1.0"
 description = "Library for simple JWT authenticate for an aiohttp application"
 authors = ["Hound672"]
 
@@ -9,6 +9,7 @@ python = "^3.7"
 pyjwt = "1.7.1"
 aiohttp = "3.5.4"
 cryptography = "2.6.1"
+pydantic = "0.31.1"
 
 [tool.poetry.dev-dependencies]
 sphinx = "1.8.5"

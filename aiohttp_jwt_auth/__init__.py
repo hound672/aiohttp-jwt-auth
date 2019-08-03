@@ -10,11 +10,11 @@ import re
 from collections import namedtuple
 from typing import Union, Match
 
-from .init import init_auth
+from .init import init_app_auth
 
-__all__ = ('init_auth', 'version_info')
+__all__ = ('init_app_auth', 'version_info')
 
-__version__ = '0.0.2'
+__version__ = '0.1.0'
 
 VersionInfo = namedtuple('VersionInfo',
                          'major minor micro')

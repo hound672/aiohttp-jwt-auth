@@ -6,47 +6,61 @@
 
 """
 
-import jwt
+from typing import Mapping, Any
 
+import jwt
 from aiohttp.web_request import Request
 
-from aiohttp_jwt_auth import exceptions as jwt_auth_exceptions
-from aiohttp_jwt_auth.structs import UserDataToken
+from . import exceptions as jwt_auth_exceptions
+from .structs import BaseUserDataToken
+from .types import HttpAuthHeader, JWTString, PublicKey
 
 
-def get_authorization_header(request: Request) -> str:
+def get_authorization_header(request: Request) -> HttpAuthHeader:
     """
-    Return request's 'Authorization:' header
+    Return http authorization header from request
+
+    :param request: Request's object
+    :return: authorization header
     """
-    return request.headers.get('Authorization', '')
+    header = request.headers.get('Authorization', '')
+    return HttpAuthHeader(header)
 
 
-def validate_header(*,
-                    header: str,
-                    jwt_header_prefix: str) -> str:
+def get_jwt_string(*,
+                   header: HttpAuthHeader,
+                   jwt_header_prefix: str) -> JWTString:
     """
-    Just validate header
-    Returns token from header
+    Validate authorization header and return JWT string
+
+    :param header: authorization header
+    :param jwt_header_prefix: prefix for jwt
+    :return: string with JWT
     """
     auth = header.split()
     jwt_prefix = jwt_header_prefix.lower()
 
     if not auth:
         raise jwt_auth_exceptions.AuthFailedNoHeader
-    if len(auth) == 1:
+    elif len(auth) == 1:
         raise jwt_auth_exceptions.AuthFailedNoCredentials
-    if auth[0].lower() != jwt_prefix:
+    elif auth[0].lower() != jwt_prefix:
         raise jwt_auth_exceptions.AuthFailedInvalidHeaderPrefix
-    if len(auth) > 2:
+    elif len(auth) > 2:
         raise jwt_auth_exceptions.AuthFailedSpaces
 
-    return auth[1]
+    return JWTString(auth[1])
 
 
-def validate_token(*, token: str, public_key: str, verify_exp: bool = True) -> UserDataToken:
+def decode_token(*,
+                 jwt_string: JWTString,
+                 public_key: PublicKey,
+                 verify_exp: bool = True) -> Mapping[str, Any]:
     """
-    Validate JWT
-    :param token: JWT string
+    Validate and decode JWT from JWTString.
+    Return decoded token
+
+    :param jwt_string: JWT string
     :param public_key: public key for check sign
     :param verify_exp: flag for verify expired time
     :return: user's payload
@@ -58,12 +72,11 @@ def validate_token(*, token: str, public_key: str, verify_exp: bool = True) -> U
 
     try:
         payload = jwt.decode(
-            jwt=token,
+            jwt=jwt_string,
             key=public_key,
             algorithms='RS256',
             options=options
-        )  # type: ignore
-        user_data_token = UserDataToken(payload)  # type: ignore
+        )
 
     except jwt.DecodeError as err:
         raise jwt_auth_exceptions.AuthFailedDecodeError(str(err))
@@ -72,4 +85,4 @@ def validate_token(*, token: str, public_key: str, verify_exp: bool = True) -> U
     except jwt.ExpiredSignature as err:
         raise jwt_auth_exceptions.AuthFailedDecodeError(str(err))
 
-    return user_data_token
+    return payload

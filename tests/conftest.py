@@ -6,72 +6,51 @@
 
 """
 
+import os
+
+import jwt
 import pytest
 from aiohttp import web
+from faker import Factory
 
-from aiohttp_jwt_auth.consts import JWT_PUBLIC_KEY, JWT_AUTH_APP
+from aiohttp_jwt_auth import init_app_auth
+from aiohttp_jwt_auth.consts import APP_JWT_AUTH
+from aiohttp_jwt_auth.structs import JwtAuthApp
 
-from tests.mock_app import init_mock_app
+
+def key_path(key_name) -> str:
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                        'keys', key_name)
+
+
+########################################################
+
+@pytest.fixture
+def faker():
+    """Faker object"""
+    return Factory.create()
+
+@pytest.fixture
+def public_key():
+    """Get public key"""
+    with open(key_path('testkey.pub'), 'r') as key_file:
+        return key_file.read()
 
 
 @pytest.fixture
-async def app(loop) -> web.Application:
-    """
-    Returns app object
-    """
-    app = await init_mock_app()
-
-    return app
+def private_key():
+    """Get private key"""
+    with open(key_path('testkey.pem'), 'r') as key_file:
+        return key_file.read()
 
 
 @pytest.fixture
-async def api_client(app: web.Application, aiohttp_client):
-    """
-    Returns object for API calls
-    """
-    return await aiohttp_client(app)
-
-
-@pytest.fixture
-def url_test_mixin(app: web.Application):
-    """
-    Returns URL for mixin unittests
-    """
-    return app.router['for_test_mixin'].url_for()
-
-
-@pytest.fixture
-def url_no_expired(app: web.Application):
-    """
-    Returns URL for mixin unittests
-    """
-    return app.router['no_expired'].url_for()
-
-
-@pytest.fixture
-async def api_mixin_test(api_client, url_test_mixin):
-    """
-    For test JWTAuthMixin
-    """
-
-    async def send_request(header):
-        return await api_client.get(url_test_mixin, headers={'Authorization': header})
-
-    return send_request
-
-
-@pytest.fixture
-async def api_mixin_test_no_expired(api_client, url_no_expired):
-    """
-    For test JWTAuthMixin
-    """
-
-    async def send_request(header):
-        return await api_client.get(url_no_expired, headers={'Authorization': header})
-
-    return send_request
-
-
-@pytest.fixture
-def public_key(app):
-    return app[JWT_AUTH_APP][JWT_PUBLIC_KEY]
+def decode_jwt(private_key):
+    def _decode(payload: dict):
+        _jwt = jwt.encode(
+            payload=payload,
+            key=private_key,
+            algorithm='RS256'
+        )
+        return _jwt.decode('utf8')
+    return _decode
