@@ -12,7 +12,6 @@ import jwt
 from aiohttp.web_request import Request
 
 from . import exceptions as jwt_auth_exceptions
-from .structs import BaseUserDataToken
 from .types import HttpAuthHeader, JWTString, PublicKey
 
 
