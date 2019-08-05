@@ -42,7 +42,7 @@ def get_jwt_string(*,
     if not auth:
         raise jwt_auth_exceptions.AuthFailedNoHeader
     elif len(auth) == 1:
-        raise jwt_auth_exceptions.AuthFailedNoCredentials
+        raise jwt_auth_exceptions.AuthFailedNoJwt
     elif auth[0].lower() != jwt_prefix:
         raise jwt_auth_exceptions.AuthFailedInvalidHeaderPrefix
     elif len(auth) > 2:

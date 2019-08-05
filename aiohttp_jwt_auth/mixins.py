@@ -31,21 +31,8 @@ class JWTAuthMixin:
     _verify_expired = True
 
     def __init__(self, request: Request) -> None:
-        try:
-            user_data = self._authenticate(request)
-            request['user'] = user_data
-
-        except jwt_auth_exceptions.AuthFailed as err:
-            raise web_exceptions.HTTPUnauthorized(
-                reason=str(err),
-                content_type='application/json'
-            )
-        except jwt_auth_exceptions.InternalServerError as err:
-            raise web_exceptions.HTTPInternalServerError(
-                reason=str(err),
-                content_type='application/json'
-            )
-
+        user_data = self._authenticate(request)
+        request['user'] = user_data
         super().__init__(request)  # type: ignore
 
     def _authenticate(self, request: Request) -> 'BaseUserDataToken':
@@ -66,5 +53,5 @@ class JWTAuthMixin:
         try:
             user_data = UserModel(**decoded_jwt)
         except ValidationError:
-            raise jwt_auth_exceptions.InvalidClaims
+            raise jwt_auth_exceptions.AuthFailedInvalidClaims
         return user_data

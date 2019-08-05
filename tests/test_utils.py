@@ -50,7 +50,7 @@ def test_get_jwt_string_failed_no_header():
 def test_get_jwt_string_header_failed_no_credentials():
     header = HttpAuthHeader(f'{JWT_HEADER}')
 
-    with pytest.raises(jwt_exceptions.AuthFailedNoCredentials):
+    with pytest.raises(jwt_exceptions.AuthFailedNoJwt):
         get_jwt_string(header=header,
                        jwt_header_prefix=JWT_HEADER)
 

@@ -6,54 +6,44 @@
 
 """
 
-from typing import Optional
+from aiohttp import web_exceptions
 
 
-class JwtAuthBaseException(Exception):
+class JwtAuthMixinException:
     _detail: str = 'Something went wrong'
 
-    def __init__(self, detail: Optional[str] = None) -> None:
-        self._detail = detail or self._detail
-
-    def __str__(self) -> str:
-        return self._detail
-
-    @classmethod
-    def get_detail(cls) -> str:
-        return cls._detail
+    def __init__(self) -> None:
+        super().__init__(text=self._detail)  # type: ignore
 
 
-class InternalServerError(JwtAuthBaseException):
-    _detail = 'Internal server error'
+class JwtAuthBaseException(JwtAuthMixinException, web_exceptions.HTTPUnauthorized):
+    pass
 
 
-class AuthFailed(JwtAuthBaseException):
-    _detail = 'Incorrect authentication credentials.'
+########################################################
 
 
-class InvalidClaims(AuthFailed):
+class AuthFailedInvalidClaims(JwtAuthBaseException):
     _detail = 'Invalid claims'
 
 
-class AuthFailedNoHeader(AuthFailed):
-    _detail = 'There is no authorization header.'
+class AuthFailedNoHeader(JwtAuthBaseException):
+    _detail = 'There is no authorization header'
 
 
-class AuthFailedNoCredentials(AuthFailed):
+class AuthFailedNoJwt(JwtAuthBaseException):
     _detail = 'No credentials provided.'
 
 
-class AuthFailedInvalidHeaderPrefix(AuthFailed):
+class AuthFailedInvalidHeaderPrefix(JwtAuthBaseException):
     _detail = 'Invalid header prefix.'
 
 
-class AuthFailedSpaces(AuthFailed):
+class AuthFailedSpaces(JwtAuthBaseException):
     _detail = 'Credentials string should not contain spaces.'
 
 
-class AuthFailedDecodeError(AuthFailed):
+class AuthFailedDecodeError(JwtAuthBaseException):
     def __init__(self, detail: str = None):
         self._detail = f'Error decode token: {detail}'
-
-# class PublicKeyEmptyError(InternalServerError):
-#     _detail = 'Public key is empty!'
+        super().__init__()
