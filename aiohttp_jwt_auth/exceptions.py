@@ -6,8 +6,10 @@
 
 """
 
+
 from aiohttp import web_exceptions
 
+from typing import Optional
 
 class JwtAuthMixinException:
     _detail: str = 'Something went wrong'
@@ -44,6 +46,6 @@ class AuthFailedSpaces(JwtAuthBaseException):
 
 
 class AuthFailedDecodeError(JwtAuthBaseException):
-    def __init__(self, detail: str = None):
+    def __init__(self, detail: Optional[str] = None):
         self._detail = f'Error decode token: {detail}'
         super().__init__()

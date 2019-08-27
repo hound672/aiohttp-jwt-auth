@@ -8,7 +8,6 @@
 
 import logging
 
-from aiohttp import web_exceptions
 from aiohttp.web_request import Request
 from pydantic import ValidationError
 
