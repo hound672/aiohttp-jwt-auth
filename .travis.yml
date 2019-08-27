@@ -3,6 +3,11 @@ language: python
 python:
   - 3.7
 
+branches:
+  only:
+    - master
+    - dev
+
 before_install:
   pip install poetry
   export
