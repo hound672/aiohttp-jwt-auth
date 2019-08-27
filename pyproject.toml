@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiohttp-jwt-auth"
-version = "0.0.2"
+version = "0.1.0"
 description = "Library for simple JWT authenticate for an aiohttp application"
 authors = ["Hound672"]
 
@@ -9,6 +9,7 @@ python = "^3.7"
 pyjwt = "1.7.1"
 aiohttp = "3.5.4"
 cryptography = "2.6.1"
+pydantic = "0.31.1"
 
 [tool.poetry.dev-dependencies]
 sphinx = "1.8.5"
@@ -17,6 +18,8 @@ pytest-aiohttp = "0.3.0"
 mypy = "0.670"
 pytest-cov = "2.6.1"
 factory-boy = "2.11.1"
+wemake-python-styleguide = "^0.12.3"
+pytest-pythonpath = "^0.7.3"
 
 
 [build-system]
