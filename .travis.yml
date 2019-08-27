@@ -10,5 +10,5 @@ before_install:
 install: poetry update
 
 script:
-#  - flake8 aiohttp_jwt_auth
+  - flake8 aiohttp_jwt_auth
   - pytest
