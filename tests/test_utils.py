@@ -11,9 +11,9 @@ import time
 
 from aiohttp.test_utils import make_mocked_request
 
-from aiohttp_jwt_auth import exceptions as jwt_exceptions
-from aiohttp_jwt_auth.utils import get_authorization_header, get_jwt_string, decode_token
-from aiohttp_jwt_auth.types import HttpAuthHeader, JWTString
+from aiohttp_jwt_auth import _exceptions as jwt_exceptions
+from aiohttp_jwt_auth._utils import get_authorization_header, get_jwt_string, decode_token
+from aiohttp_jwt_auth._types import HttpAuthHeader, JWTString
 
 JWT_HEADER: str = 'JWT'
 

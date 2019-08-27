@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+"""Types."""
+
 from typing import NewType
 
 HttpAuthHeader = NewType('HttpAuthHeader', str)

@@ -5,9 +5,9 @@ from aiohttp import web
 from aiohttp import web_exceptions
 
 from aiohttp_jwt_auth import init_app_auth
-from aiohttp_jwt_auth import exceptions as jwt_exceptions
-from aiohttp_jwt_auth.structs import BaseUserDataToken
-from aiohttp_jwt_auth.mixins import JWTAuthMixin
+from aiohttp_jwt_auth import _exceptions as jwt_exceptions
+from aiohttp_jwt_auth._structs import BaseUserDataToken
+from aiohttp_jwt_auth._mixins import JWTAuthMixin
 
 
 class UserModel(BaseUserDataToken):

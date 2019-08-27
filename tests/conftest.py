@@ -15,7 +15,7 @@ from faker import Factory
 
 from aiohttp_jwt_auth import init_app_auth
 from aiohttp_jwt_auth.consts import APP_JWT_AUTH
-from aiohttp_jwt_auth.structs import JwtAuthApp
+from aiohttp_jwt_auth._structs import JwtAuthApp
 
 
 def key_path(key_name) -> str:

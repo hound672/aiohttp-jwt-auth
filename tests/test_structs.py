@@ -9,7 +9,7 @@
 import pytest
 import pydantic
 
-from aiohttp_jwt_auth.structs import BaseUserDataToken
+from aiohttp_jwt_auth._structs import BaseUserDataToken
 
 
 class UserDataToken(BaseUserDataToken):

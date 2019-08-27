@@ -1,34 +1,25 @@
 # -*- coding: utf-8 -*-
-"""
-    structs
-    ~~~~~~~~~~~~~~~
 
+"""Structs."""
 
-"""
-
-from typing import Type
 from dataclasses import dataclass
+from typing import Type
 
 from pydantic import BaseModel
 
-from .types import PublicKey
+from aiohttp_jwt_auth._types import PublicKey
 
 
 @dataclass
 class JwtAuthApp:
-    """
-    Stores jwt_auth app
-    """
+    """Stores jwt_auth app."""
+
     public_key: PublicKey
     jwt_header_prefix: str
     user_model: Type['BaseUserDataToken']
 
 
-
 ########################################################
 
 class BaseUserDataToken(BaseModel):
-    """
-    Base model for describe User
-    """
-    pass
+    """Base model for describe User."""
